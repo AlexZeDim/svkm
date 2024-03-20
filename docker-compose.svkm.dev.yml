@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  mongo-db:
+    image: mongo:jammy
+    restart: always
+    container_name: mongo-db
+    volumes:
+      - ./volumes/mongo:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=svkm
+      - MONGO_INITDB_ROOT_PASSWORD=svkm-mongo-node-1
+      - MONGO_INITDB_DATABASE=svkm
+    ports:
+      - "27017-27019:27017-27019"
+
+  redis-cache:
+    image: redis:7-alpine
+    restart: always
+    container_name: redis-cache
+    volumes:
+      - redis:/data:rw,z
+    expose:
+      - 6379
+    ports:
+      - '6379:6379'
+    networks:
+      - svkm-network
+
+# Docker Networks
+networks:
+  # All container connect in a network
+  svkm-network:
+    driver: bridge
+
+volumes:
+  mongo:
+  redis:
