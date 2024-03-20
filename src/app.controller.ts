@@ -1,5 +1,6 @@
 import { Controller, Delete, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
+import { FilterDto } from '@svkm/resources';
 
 @Controller()
 export class AppController {
@@ -26,7 +27,7 @@ export class AppController {
   }
 
   @Get('/getByFilter')
-  getByFilter(): string {
-    return this.appService.getByFilter();
+  async getByFilter(queryFilter: FilterDto): Promise<string> {
+    return await this.appService.getByFilter(queryFilter);
   }
 }
