@@ -1,10 +1,18 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { config } from '@svkm/config';
 import process from 'node:process';
-import { FilterDto } from '@svkm/resources';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from '@svkm/db-storage';
+
+import {
+  adj,
+  capitalize,
+  category,
+  FilterDto,
+  random,
+  toSlug,
+} from '@svkm/resources';
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -63,19 +71,36 @@ export class AppService implements OnApplicationBootstrap {
     try {
       const numOfDocuments = await this.categoryModel.countDocuments();
       const isNumberOfDocuments = numOfDocuments >= length;
-      if (isNumberOfDocuments) {
-        this.logger.debug(
-          `There are already ${isNumberOfDocuments} categories in the collection!`,
-        );
-        return;
-      }
+      this.logger.debug(
+        `There are already ${isNumberOfDocuments} categories in the collection!`,
+      );
+      if (isNumberOfDocuments) return;
 
       length = length - numOfDocuments;
 
-      const documents = Array.from({ length }, () => 5);
+      this.logger.debug(`Adding ${length} categories in the collection...`);
 
-      const t = new Category();
+      const documents = Array(length)
+        .fill(0)
+        .map((e, i) => {
+          const [adjLength, categoryLength] = [adj.length, category.length];
 
+          const adjItx = random(0, adjLength - 1);
+          const catItx = random(0, categoryLength - 1);
+
+          const [a, c] = [adj[adjItx], category[catItx]];
+
+          const name = capitalize(`${a} ${c}`);
+
+          return new this.categoryModel({
+            name,
+            slug: toSlug(name),
+            description: '',
+            active: i % 2 === 0,
+          });
+        });
+
+      await this.categoryModel.insertMany(documents);
     } catch (error) {
       this.logger.error(error);
     }
