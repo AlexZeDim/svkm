@@ -1,4 +1,5 @@
-import { Schema } from 'mongoose';
+import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ timestamps: true })
 export class Category extends Document {
@@ -24,5 +25,5 @@ export class Category extends Document {
   createdAt: Date;
 }
 
-export const CategorySchema = SchemaFactory.createForClass(SpellReagents);
+export const CategorySchema = SchemaFactory.createForClass(Category);
 CategorySchema.index({ slug: 1 }, { name: 'GET' });
