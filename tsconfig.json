@@ -17,6 +17,26 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@svkm/db-storage": [
+        "libs/db-storage/src"
+      ],
+      "@svkm/db-storage/*": [
+        "libs/db-storage/src/*"
+      ],
+      "@svkm/config": [
+        "libs/config/src"
+      ],
+      "@svkm/config/*": [
+        "libs/config/src/*"
+      ],
+      "@svkm/resources": [
+        "libs/resources/src"
+      ],
+      "@svkm/resources/*": [
+        "libs/resources/src/*"
+      ]
+    }
   }
 }

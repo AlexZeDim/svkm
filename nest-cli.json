@@ -3,6 +3,36 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true
+  },
+  "projects": {
+    "db-storage": {
+      "type": "library",
+      "root": "libs/db-storage",
+      "entryFile": "index",
+      "sourceRoot": "libs/db-storage/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/db-storage/tsconfig.lib.json"
+      }
+    },
+    "config": {
+      "type": "library",
+      "root": "libs/config",
+      "entryFile": "index",
+      "sourceRoot": "libs/config/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/config/tsconfig.lib.json"
+      }
+    },
+    "resources": {
+      "type": "library",
+      "root": "libs/resources",
+      "entryFile": "index",
+      "sourceRoot": "libs/resources/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/resources/tsconfig.lib.json"
+      }
+    }
   }
 }
