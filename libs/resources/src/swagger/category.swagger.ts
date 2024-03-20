@@ -1,3 +1,5 @@
+import { ApiPropertyOptions } from '@nestjs/swagger';
+
 export const SWAGGER_CATEGORY_ID: ApiPropertyOptions = {
   name: 'id',
   description: 'Id of the category',
