@@ -1,9 +1,21 @@
 {
-  "moduleFileExtensions": ["js", "json", "ts"],
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "@svkm/db-storage/(.*)": "<rootDir>/../libs/db-storage/src/$1",
+    "@svkm/db-storage": "<rootDir>/../libs/db-storage/src",
+    "@svkm/config/(.*)": "<rootDir>/../libs/config/src/$1",
+    "@svkm/config": "<rootDir>/../libs/config/src",
+    "@svkm/resources/(.*)": "<rootDir>/../libs/resources/src/$1",
+    "@svkm/resources": "<rootDir>/../libs/resources/src"
   }
 }
