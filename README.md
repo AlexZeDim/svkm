@@ -8,7 +8,7 @@
 
 Манифест для `docker-compose` поможет запустить всё необходимое окружение `mongodb`.
 
-### Зайти на локальный адрес по выделенному (3000) порту из `app.module.ts` [localhost:3000/api/doc](http://localhost:3000/api/doc)
+### Зайти на локальный адрес по выделенному (3000) порту из `app.module.ts` [localhost:3000/api/docs](http://localhost:3000/api/docs)
 
 ### Добавить .ENV 
 ```dotenv
