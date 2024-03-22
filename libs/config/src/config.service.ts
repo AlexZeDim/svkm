@@ -10,15 +10,15 @@ const configFilePath = path.join(
   `${process.env.NODE_ENV}.yml`,
 );
 
-const isExists = fs.existsSync(configFilePath);
-
-if (isExists) {
-  const yaml = fs.readFileSync(configFilePath, 'utf8');
-  const config = YAML.parse(yaml);
-}
-
-export const config = {
+export let config = {
   mongo: {
     connectionString: process.env.MONGO_CONNECTION,
   },
 };
+
+const isExists = fs.existsSync(configFilePath);
+
+if (isExists) {
+  const yaml = fs.readFileSync(configFilePath, 'utf8');
+  config = YAML.parse(yaml);
+}
