@@ -4,7 +4,11 @@ import { config } from '@svkm/config';
 import { Category, CategorySchema } from '@svkm/db-storage';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { EXAMPLE_MOCK_CATEGORY, RESPONSE_MOCK_CATEGORY } from '../test/mocks';
+import {
+  EXAMPLE_MOCK_CATEGORY,
+  RESPONSE_MOCK_CATEGORY,
+  UPDATE_MOCK_CATEGORY,
+} from '../test/mocks';
 
 describe('AppController', () => {
   let appController: AppController;
@@ -48,13 +52,41 @@ describe('AppController', () => {
     });
   });
 
+  describe('update', () => {
+    it('update play cube', async () => {
+      const response = await appController.updateCategory(
+        EXAMPLE_MOCK_CATEGORY.slug,
+        UPDATE_MOCK_CATEGORY,
+      );
+      console.log(response);
+      expect(response).toHaveProperty('message');
+      expect(response).toHaveProperty('category');
+      const { category } = response as unknown as any;
+      expect(category).toMatchObject(RESPONSE_MOCK_CATEGORY);
+    });
+  });
+
+  describe('updateNotExist', () => {
+    it('not exists cube', async () => {
+      const response = (await appController.updateCategory(
+        'playcube',
+        UPDATE_MOCK_CATEGORY,
+      )) as unknown as any;
+      expect(response).toHaveProperty('message');
+      expect(response).toHaveProperty('status');
+      expect(response.status).toBe(404);
+    });
+  });
+
   describe('delete', () => {
     it('delete category', async () => {
-      const response = (await appController.deleteCategory(
+      const response = await appController.deleteCategory(
         EXAMPLE_MOCK_CATEGORY.slug,
-      )) as unknown as any;
-      console.log(response);
-      expect(1).toBe(1);
+      );
+      expect(response).toHaveProperty('message');
+      expect(response).toHaveProperty('category');
+      const { category } = response as unknown as any;
+      expect(category).toMatchObject(RESPONSE_MOCK_CATEGORY);
     });
   });
 

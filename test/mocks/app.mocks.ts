@@ -5,6 +5,12 @@ export const EXAMPLE_MOCK_CATEGORY = {
   active: false,
 };
 
+export const UPDATE_MOCK_CATEGORY = {
+  name: 'Плотный куб',
+  description: 'Выше плотнейшество куб',
+  active: true,
+};
+
 export const RESPONSE_MOCK_CATEGORY = {
   id: expect.any(String),
   name: expect.any(String),

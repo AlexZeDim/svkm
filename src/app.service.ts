@@ -9,7 +9,7 @@ import {
 
 import { config } from '@svkm/config';
 import process from 'node:process';
-import { FilterQuery, Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from '@svkm/db-storage';
 
@@ -62,12 +62,27 @@ export class AppService implements OnApplicationBootstrap {
   async updateCategory(slugOrId: string, categoryDto: Partial<CategoryDto>) {
     try {
       const filterQuery = queryToSlug(slugOrId);
-      const existCategory = await this.categoryModel.findOne<Category>(filterQuery);
+      const existCategory = await this.categoryModel.findOne<Category>(
+        filterQuery,
+      );
       if (!existCategory) return new NotFoundException('Категория не найдена');
 
       const message = `Каталог ${slugOrId} был успешно обновлен`;
-      const updCategory = CategoryDto.fromDto(categoryDto.this.categoryModel);
-      const category = await this.categoryModel.updateOne({ _id: existCategory._id }, updCategory);
+      const categoryDocument = await this.categoryModel.findByIdAndUpdate(
+        existCategory._id,
+        {
+          slug: categoryDto.slug,
+          name: categoryDto.name,
+          description: categoryDto.description,
+          active: categoryDto.active,
+        },
+        {
+          upsert: false,
+          new: true,
+        },
+      );
+
+      const category = CategoryDto.fromDocument(categoryDocument);
 
       return { message, category };
     } catch (error) {
