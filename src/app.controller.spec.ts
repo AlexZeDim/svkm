@@ -105,6 +105,7 @@ describe('AppController', () => {
         pageSize: 2,
         page: 3,
       });
+      console.log(response);
       expect(1).toBe(1);
     });
   });

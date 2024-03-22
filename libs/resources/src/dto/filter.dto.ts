@@ -55,49 +55,72 @@ export class FilterDto {
   sort: string;
 
   public static fromDto(filterDto: Partial<FilterDto>) {
+    const filterMap = new Map<string, FilterQuery<Category>>([
+      [
+        'isBySearch',
+        {
+          $text: { $search: filterDto.search },
+        },
+      ],
+      [
+        'isNameAndDescription',
+        {
+          $or: [
+            { name: { $regex: `/${filterDto.name}/`, $options: 'i' } },
+            {
+              description: {
+                $regex: `/${filterDto.description}/`,
+                $options: 'i',
+              },
+            },
+          ],
+        },
+      ],
+      ['isByActiveOnly', { active: filterDto.active }],
+      [
+        'isByActiveAndName',
+        {
+          $and: [
+            { name: filterDto.active },
+            { name: { $regex: `/${filterDto.name}/`, $options: 'i' } },
+          ],
+        },
+      ],
+      [
+        'isByActiveAndDesc',
+        {
+          $and: [
+            { active: filterDto.active },
+            {
+              description: {
+                $regex: `/${filterDto.description}/`,
+                $options: 'i',
+              },
+            },
+          ],
+        },
+      ],
+      ['byDefault', {}],
+    ]);
+
     const isBySearch = Boolean(filterDto.search);
-
-    let searchFilter: FilterQuery<Category>;
-
-    if (isBySearch) {
-      searchFilter = {
-        $text: { $search: filterDto.search },
-      };
-    }
-
-    const filterOr = [];
-    if (!isBySearch) {
-      if (filterDto.name) {
-        filterOr.push({ name: filterDto.name });
-      }
-
-      if (filterDto.description) {
-        filterOr.push({ description: filterDto.description });
-      }
-
-      searchFilter = {
-        $or: filterOr,
-      };
-    }
-
+    if (isBySearch) return filterMap.get('isBySearch');
     const isByActive = 'active' in filterDto;
-    const isByActiveOnly = filterOr.length === 0;
+    const isNameAndDescription =
+      Boolean(filterDto.name) && Boolean(filterDto.description);
+    const isByActiveOnly =
+      !isBySearch &&
+      !filterDto.name &&
+      !filterDto.description &&
+      'active' in filterDto;
 
-    if (isByActiveOnly && isByActive) {
-      searchFilter = { active: filterDto.active };
-    }
+    if (isByActiveOnly) return filterMap.get('isByActiveOnly');
+    if (isNameAndDescription && isByActive)
+      return filterMap.get('isNameAndDescription');
 
-    if (!isByActiveOnly && isByActive) {
-      searchFilter = {
-        $and: [
-          {
-            $or: filterOr,
-          },
-          { active: filterDto.active },
-        ],
-      };
-    }
+    if (isNameAndDescription && !isByActive)
+      return filterMap.get('isNameAndDescription');
 
-    return searchFilter;
+    return filterMap.get('byDefault');
   }
 }
