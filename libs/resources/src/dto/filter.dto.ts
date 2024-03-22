@@ -11,8 +11,6 @@ import {
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { SORING } from '@svkm/resources/const';
-import { FilterQuery } from 'mongoose';
-import { Category } from '@svkm/db-storage';
 
 export class FilterDto {
   @ApiProperty(SWAGGER_FILTER_NAME)
