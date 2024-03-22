@@ -55,72 +55,54 @@ export class FilterDto {
   sort: string;
 
   public static fromDto(filterDto: Partial<FilterDto>) {
-    const filterMap = new Map<string, FilterQuery<Category>>([
-      [
-        'isBySearch',
-        {
-          $text: { $search: filterDto.search },
-        },
-      ],
-      [
-        'isNameAndDescription',
-        {
-          $or: [
-            { name: { $regex: `/${filterDto.name}/`, $options: 'i' } },
-            {
-              description: {
-                $regex: `/${filterDto.description}/`,
-                $options: 'i',
-              },
-            },
-          ],
-        },
-      ],
-      ['isByActiveOnly', { active: filterDto.active }],
-      [
-        'isByActiveAndName',
-        {
-          $and: [
-            { name: filterDto.active },
-            { name: { $regex: `/${filterDto.name}/`, $options: 'i' } },
-          ],
-        },
-      ],
-      [
-        'isByActiveAndDesc',
-        {
-          $and: [
-            { active: filterDto.active },
-            {
-              description: {
-                $regex: `/${filterDto.description}/`,
-                $options: 'i',
-              },
-            },
-          ],
-        },
-      ],
-      ['byDefault', {}],
-    ]);
+    const pipeline = [];
 
-    const isBySearch = Boolean(filterDto.search);
-    if (isBySearch) return filterMap.get('isBySearch');
+    const isBySearch =
+      Boolean(filterDto.search) ||
+      Boolean(filterDto.name) ||
+      Boolean(filterDto.description);
+
+    if (isBySearch) {
+      const bySearchMatch = {
+        $match: {
+          $text: {
+            $search: filterDto.search
+              ? filterDto.search
+              : filterDto.name
+              ? filterDto.name
+              : filterDto.description,
+          },
+        },
+      };
+
+      pipeline.push(bySearchMatch);
+    }
+
     const isByActive = 'active' in filterDto;
-    const isNameAndDescription =
-      Boolean(filterDto.name) && Boolean(filterDto.description);
-    const isByActiveOnly =
-      !isBySearch &&
-      !filterDto.name &&
-      !filterDto.description &&
-      'active' in filterDto;
+    if (isByActive) {
+      const byActiveMatch = {
+        $match: { active: filterDto.active },
+      };
 
-    if (isByActiveOnly) return filterMap.get('isByActiveOnly');
-    if (isNameAndDescription && isByActive)
-      return filterMap.get('isNameAndDescription');
+      pipeline.push(byActiveMatch);
+    }
 
-    if (isNameAndDescription && !isByActive)
-      return filterMap.get('isNameAndDescription');
+    if (filterDto.page) {
+      const skip = {
+        $skip: filterDto.page,
+      };
 
-    return filterMap.get('byDefault');
+      pipeline.push(skip);
+    }
+
+    if (filterDto.pageSize) {
+      const limit = {
+        $limit: filterDto.pageSize || 2,
+      };
+
+      pipeline.push(limit);
+    }
+
+    return pipeline;
   }
 }

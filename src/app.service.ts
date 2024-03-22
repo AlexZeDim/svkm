@@ -7,8 +7,6 @@ import {
   OnApplicationBootstrap,
 } from '@nestjs/common';
 
-import { config } from '@svkm/config';
-import process from 'node:process';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from '@svkm/db-storage';
@@ -17,7 +15,6 @@ import {
   adj,
   capitalize,
   category,
-  CategoryByIdOrSlug,
   CategoryDto,
   FilterDto,
   queryToSlug,
@@ -141,16 +138,14 @@ export class AppService implements OnApplicationBootstrap {
     try {
       // TODO sort by
 
-      const searchFilter = FilterDto.fromDto(filter);
-      const skip = filter.pageSize || 2;
-      const limit = 1;
+      const aggregationPipeline = FilterDto.fromDto(filter);
 
-      console.log(searchFilter);
 
-      const categories = await this.categoryModel
-        .find(searchFilter)
-        .skip(skip)
-        .limit(limit);
+      console.log(aggregationPipeline);
+
+      const categories = await this.categoryModel.aggregate<Category>(
+        aggregationPipeline,
+      );
 
       return categories.map((category) => CategoryDto.fromDocument(category));
     } catch (error) {

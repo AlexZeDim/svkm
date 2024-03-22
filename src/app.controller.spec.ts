@@ -101,7 +101,8 @@ describe('AppController', () => {
   describe('getByFilter', () => {
     it('getByFilter', async () => {
       const response = await appController.getByFilter({
-        name: EXAMPLE_MOCK_CATEGORY.name,
+        active: true,
+        name: 'сласти',
         pageSize: 2,
         page: 3,
       });
