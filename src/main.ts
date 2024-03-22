@@ -12,8 +12,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const options = new DocumentBuilder()
-    .setTitle('Commonwealth Backend')
-    .setDescription('Provides REST API for CMNW-DB')
+    .setTitle('SVKM Backend')
+    .setDescription('Provides REST API for SVKM')
     .setVersion('1.0.0')
     .addBearerAuth()
     .build();
