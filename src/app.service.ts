@@ -1,4 +1,10 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 import { config } from '@svkm/config';
 import process from 'node:process';
 import { Model } from 'mongoose';
@@ -9,6 +15,7 @@ import {
   adj,
   capitalize,
   category,
+  CategoryDto,
   FilterDto,
   random,
   toSlug,
@@ -27,21 +34,34 @@ export class AppService implements OnApplicationBootstrap {
   /**
    * @description Создать категорию
    */
-  createCategory(): string {
-    return 'createCategory!';
+  async createCategory(categoryDto: CategoryDto): Promise<CategoryDto> {
+    try {
+      const isExists = await this.categoryModel.findOne({
+        slug: categoryDto.slug,
+      });
+
+      if (isExists) throw new ConflictException('Category already exist');
+
+      const category = new this.categoryModel(categoryDto);
+
+      const categoryDoc = await this.categoryModel.create(category);
+      return CategoryDto.fromDocument(categoryDoc);
+    } catch (error) {
+      this.logger.error(error);
+    }
   }
   /**
    * @description Изменить категорию. Добавить поддержку частичного обновления
    * модели. Например, возможность изменить только active без
    * необходимости передавать всю модель. И так для любого поля модели.
    */
-  updateCategory(): string {
+  async updateCategory(slug): string {
     return 'updateCategory';
   }
   /**
    * @description Удалить категорию
    */
-  deleteCategory(): string {
+  async deleteCategory(): string {
     return 'deleteCategory!';
   }
   /**

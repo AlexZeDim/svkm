@@ -1,24 +1,40 @@
-import { Controller, Delete, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { AppService } from './app.service';
-import { FilterDto } from '@svkm/resources';
+import { CategoryBySlug, CategoryDto, FilterDto } from '@svkm/resources';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Post('/createCategory')
-  createCategory(): string {
-    return this.appService.createCategory();
+  async createCategory(@Res() res, @Body() categoryDto: CategoryDto) {
+    const category = await this.appService.createCategory(categoryDto);
+    return res.status(HttpStatus.OK).json({
+      message: 'Category has been created successfully',
+      category,
+    });
   }
 
-  @Post('/updateCategory')
-  updateCategory(): string {
-    return this.appService.updateCategory();
+  @Patch('updateCategory/:slug')
+  async updateCategory(@Param() param: CategoryBySlug, @Response() res: any, @Body() body: CategoryDto) {
+    const category = await this.appService.updateCategory(param.slug, body);
+    return res.status(HttpStatus.OK).json(category);
   }
 
-  @Delete('/deleteCategory')
+  @Delete('deleteCategory/:slug')
   deleteCategory(): string {
-    return this.appService.deleteCategory();
+    const category = await this.appService.deleteCategory();
+    return res.status(HttpStatus.OK).json(category);
   }
 
   @Get('/getByIdOrSlug')
