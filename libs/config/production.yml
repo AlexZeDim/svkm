@@ -1,0 +1,2 @@
+mongo:
+  connectionString: 'mongodb://svkm:svkm-mongo-node-1@mongo-db:27017/oraculum?authSource=admin&readPreference=primary'
