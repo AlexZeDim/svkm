@@ -142,8 +142,10 @@ export class AppService implements OnApplicationBootstrap {
         aggregationPipeline,
       );
 
-      const message = 'Массив категорий по фильтру найден'
-      const category = categories.map((category) => CategoryDto.fromDocument(category));
+      const message = 'Массив категорий по фильтру найден';
+      const category = categories.map((category) =>
+        CategoryDto.fromDocument(category),
+      );
       return { message, category };
     } catch (error) {
       this.logger.error(error);
