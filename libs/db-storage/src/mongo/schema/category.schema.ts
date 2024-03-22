@@ -27,3 +27,17 @@ export class Category extends Document {
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
 CategorySchema.index({ slug: 1 }, { name: 'GET' });
+CategorySchema.index(
+  {
+    name: 'text',
+    description: 'text',
+  },
+  {
+    default_language: 'russian',
+    weights: {
+      name: 5,
+      description: 1,
+    },
+    name: 'TEXT_FILTER',
+  },
+);
