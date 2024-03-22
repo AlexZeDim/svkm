@@ -20,4 +20,8 @@ export const getFromCache = (slug: string) => {
 
 export const setToCache = (slug: string, category: CategoryDto) => {
   cacheMap.set(slug, category);
+  const isCapped = cacheMap.size > 10;
+  if (isCapped) {
+    cacheMap.clear();
+  }
 };

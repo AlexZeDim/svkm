@@ -17,7 +17,9 @@ import {
   category,
   CategoryDto,
   FilterDto,
+  getFromCache,
   queryToSlug,
+  setToCache,
   toSlug,
 } from '@svkm/resources';
 
@@ -114,6 +116,11 @@ export class AppService implements OnApplicationBootstrap {
     try {
       const filterQuery = queryToSlug(slugOrId);
 
+      const cacheCategory = getFromCache(slugOrId);
+      if (cacheCategory) {
+        return { message: 'Категория найдена в кэше', cacheCategory };
+      }
+
       const categoryDocument = await this.categoryModel.findOne<Category>(
         filterQuery,
       );
@@ -122,6 +129,8 @@ export class AppService implements OnApplicationBootstrap {
         return new NotFoundException('Категория не найдена');
 
       const category = CategoryDto.fromDocument(categoryDocument);
+
+      setToCache(slugOrId, category);
 
       return { message: 'Категория найдена', category };
     } catch (error) {
