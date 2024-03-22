@@ -136,18 +136,15 @@ export class AppService implements OnApplicationBootstrap {
    */
   async getByFilter(filter: Partial<FilterDto>) {
     try {
-      // TODO sort by
-
       const aggregationPipeline = FilterDto.fromDto(filter);
-
-
-      console.log(aggregationPipeline);
 
       const categories = await this.categoryModel.aggregate<Category>(
         aggregationPipeline,
       );
 
-      return categories.map((category) => CategoryDto.fromDocument(category));
+      const message = 'Массив категорий по фильтру найден'
+      const category = categories.map((category) => CategoryDto.fromDocument(category));
+      return { message, category };
     } catch (error) {
       this.logger.error(error);
       return new InternalServerErrorException(error);
