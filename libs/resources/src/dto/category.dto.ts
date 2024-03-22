@@ -11,6 +11,7 @@ import {
   SWAGGER_CATEGORY_SLUG,
   toSlug,
 } from '@svkm/resources';
+import { Model } from 'mongoose';
 
 export class CategoryDto {
   @ApiProperty(SWAGGER_CATEGORY_ID)
@@ -43,6 +44,19 @@ export class CategoryDto {
     const id = document._id.toString();
     return Object.assign(new CategoryDto(), {
       id,
+      slug: document.slug,
+      name: document.name,
+      description: document.description,
+      active: document.active,
+      createdAt: document.createdAt,
+    });
+  }
+
+  public static fromDto(
+    document: CategoryDto,
+    categoryModel: Model<Category>,
+  ): Category {
+    return new categoryModel({
       slug: document.slug,
       name: document.name,
       description: document.description,

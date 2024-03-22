@@ -4,14 +4,11 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpStatus,
   Param,
   Patch,
   Post,
-  Res,
 } from '@nestjs/common';
 import { AppService } from './app.service';
-import { Response } from 'express';
 import { CategoryBySlug, CategoryDto, FilterDto } from '@svkm/resources';
 
 @Controller('category')
@@ -24,12 +21,12 @@ export class AppController {
     return await this.appService.createCategory(categoryDto);
   }
 
-  @Patch('updateCategory/:slug')
+  @Patch(':slugOrId')
   async updateCategory(
-    @Param() param: CategoryBySlug,
+    @Param('slugOrId') slugOrId: string,
     @Body() body: Partial<CategoryDto>,
   ) {
-    return await this.appService.updateCategory(param.slug, body);
+    return await this.appService.updateCategory(slugOrId, body);
   }
 
   @Delete(':slugOrId')

@@ -20,6 +20,7 @@ import {
   CategoryByIdOrSlug,
   CategoryDto,
   FilterDto,
+  queryToSlug,
   toSlug,
 } from '@svkm/resources';
 
@@ -42,7 +43,7 @@ export class AppService implements OnApplicationBootstrap {
         slug: categoryDto.slug,
       });
 
-      if (isExists) return new ConflictException('Category already exist');
+      if (isExists) return new ConflictException('Категория уже была создана');
 
       const document = new this.categoryModel(categoryDto);
       const categoryDoc = await this.categoryModel.create(document);
@@ -58,19 +59,19 @@ export class AppService implements OnApplicationBootstrap {
    * модели. Например, возможность изменить только active без
    * необходимости передавать всю модель. И так для любого поля модели.
    */
-  async updateCategory(slug: string, category: Partial<CategoryDto>) {
+  async updateCategory(slugOrId: string, categoryDto: Partial<CategoryDto>) {
     try {
-      return await this.categoryModel.findOneAndUpdate<Category>(
-        { slug: slug },
-        category,
-        {
-          upsert: false,
-          new: true,
-        },
-      );
+      const filterQuery = queryToSlug(slugOrId);
+      const existCategory = await this.categoryModel.findOne<Category>(filterQuery);
+      if (!existCategory) return new NotFoundException('Категория не найдена');
+
+      const message = `Каталог ${slugOrId} был успешно обновлен`;
+      const updCategory = CategoryDto.fromDto(categoryDto.this.categoryModel);
+      const category = await this.categoryModel.updateOne({ _id: existCategory._id }, updCategory);
+
+      return { message, category };
     } catch (error) {
       this.logger.error(error);
-      // TODO review
       return new InternalServerErrorException(error);
     }
   }
@@ -79,15 +80,7 @@ export class AppService implements OnApplicationBootstrap {
    */
   async deleteCategory(slugOrId: string) {
     try {
-      let filterQuery: FilterQuery<Category> = { slug: slugOrId };
-
-      const isObjectId = Types.ObjectId.isValid(slugOrId);
-      if (isObjectId) {
-        const _id = new Types.ObjectId(slugOrId);
-        filterQuery = {
-          $or: [{ slug: slugOrId }, { _id }],
-        };
-      }
+      const filterQuery = queryToSlug(slugOrId);
 
       const document = await this.categoryModel.findOneAndDelete(filterQuery);
       const message = document

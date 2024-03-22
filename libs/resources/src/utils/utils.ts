@@ -1,4 +1,6 @@
 import { randomInt } from 'crypto';
+import { FilterQuery, Types } from 'mongoose';
+import { Category } from '@svkm/db-storage';
 
 /**
  * @description Gives a random int number in-between requested values
@@ -21,3 +23,17 @@ export const toSlug = (s: string): string =>
  */
 export const capitalize = (s: string): string =>
   s.charAt(0).toUpperCase() + s.slice(1);
+
+export const queryToSlug = (slugOrId: string): FilterQuery<Category> => {
+  let filterQuery: FilterQuery<Category> = { slug: slugOrId };
+
+  const isObjectId = Types.ObjectId.isValid(slugOrId);
+  if (isObjectId) {
+    const _id = new Types.ObjectId(slugOrId);
+    filterQuery = {
+      $or: [{ slug: slugOrId }, { _id }],
+    };
+  }
+
+  return filterQuery;
+};
