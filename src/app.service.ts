@@ -107,35 +107,45 @@ export class AppService implements OnApplicationBootstrap {
       return { message, category };
     } catch (error) {
       this.logger.error(error);
-      // TODO review
       return new InternalServerErrorException(error);
     }
   }
   /**
    * @description Получить категорию по id или slug.
    */
-  async getByIdOrSlug(args: CategoryByIdOrSlug) {
-    // TODO from dto
-    const category = await this.categoryModel.findOne<Category>({
-      $or: [{ slug: args.slug }, { _id: args.id }],
-    });
+  async getByIdOrSlug(slugOrId: string) {
+    try {
+      const filterQuery = queryToSlug(slugOrId);
 
-    if (!category) return new NotFoundException('Category not found');
+      const categoryDocument = await this.categoryModel.findOne<Category>(
+        filterQuery,
+      );
 
-    return CategoryDto.fromDocument(category);
+      if (!categoryDocument)
+        return new NotFoundException('Категория не найдена');
+
+      const category = CategoryDto.fromDocument(categoryDocument);
+
+      return { message: 'Категория найдена', category };
+    } catch (error) {
+      this.logger.error(error);
+      return new InternalServerErrorException(error);
+    }
   }
   /**
    * @description Получить массив категорий по фильтру. Без фильтров
    * по умолчанию отдаются первые две категории отсортированные по дате
    * создания (поле createdDate). Новые категории идут первыми
    */
-  async getByFilter(filter: FilterDto) {
+  async getByFilter(filter: Partial<FilterDto>) {
     try {
       // TODO sort by
 
       const searchFilter = FilterDto.fromDto(filter);
       const skip = filter.pageSize || 2;
       const limit = 1;
+
+      console.log(searchFilter);
 
       const categories = await this.categoryModel
         .find(searchFilter)
@@ -182,8 +192,6 @@ export class AppService implements OnApplicationBootstrap {
   }
 
   async onApplicationBootstrap(): Promise<void> {
-    console.log(config);
-    console.log(process.env.MONGO_CONNECTION);
     await this.generateMockData();
   }
 }

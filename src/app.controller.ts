@@ -34,13 +34,14 @@ export class AppController {
     return await this.appService.deleteCategory(slugOrId);
   }
 
-  @Get('/:query')
-  async getByIdOrSlug(query: string) {
-    // await this.appService.getByIdOrSlug(query);
+  @Get('/:slugOrId')
+  @HttpCode(200)
+  async getByIdOrSlug(@Param('slugOrId') slugOrId: string) {
+    return await this.appService.getByIdOrSlug(slugOrId);
   }
 
   @Get('getByFilter')
-  async getByFilter(queryFilter: FilterDto) {
+  async getByFilter(queryFilter: Partial<FilterDto>) {
     return await this.appService.getByFilter(queryFilter);
   }
 }

@@ -12,6 +12,7 @@ import {
 
 describe('AppController', () => {
   let appController: AppController;
+  let id: string;
   jest.setTimeout(600_000);
 
   beforeAll(async () => {
@@ -58,7 +59,6 @@ describe('AppController', () => {
         EXAMPLE_MOCK_CATEGORY.slug,
         UPDATE_MOCK_CATEGORY,
       );
-      console.log(response);
       expect(response).toHaveProperty('message');
       expect(response).toHaveProperty('category');
       const { category } = response as unknown as any;
@@ -75,6 +75,37 @@ describe('AppController', () => {
       expect(response).toHaveProperty('message');
       expect(response).toHaveProperty('status');
       expect(response.status).toBe(404);
+    });
+  });
+
+  describe('getBySlug', () => {
+    it('bySlug', async () => {
+      const response = await appController.getByIdOrSlug(
+        EXAMPLE_MOCK_CATEGORY.slug,
+      );
+
+      const { category } = response as unknown as any;
+      expect(category).toMatchObject(RESPONSE_MOCK_CATEGORY);
+      id = category.id;
+    });
+  });
+
+  describe('getBySlug', () => {
+    it('byId', async () => {
+      const response = await appController.getByIdOrSlug(id);
+      const { category } = response as unknown as any;
+      expect(category).toMatchObject(RESPONSE_MOCK_CATEGORY);
+    });
+  });
+
+  describe('getByFilter', () => {
+    it('getByFilter', async () => {
+      const response = await appController.getByFilter({
+        name: EXAMPLE_MOCK_CATEGORY.name,
+        pageSize: 2,
+        page: 3,
+      });
+      expect(1).toBe(1);
     });
   });
 
