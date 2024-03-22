@@ -9,7 +9,7 @@ import {
 
 import { config } from '@svkm/config';
 import process from 'node:process';
-import { Model } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from '@svkm/db-storage';
 
@@ -78,9 +78,30 @@ export class AppService implements OnApplicationBootstrap {
    * @description Удалить категорию
    */
   async deleteCategory(slugOrId: string) {
-    return this.categoryModel.findOneAndDelete({
-      $or: [{ slug: slugOrId }, { _id: slugOrId }],
-    });
+    try {
+      let filterQuery: FilterQuery<Category> = { slug: slugOrId };
+
+      const isObjectId = Types.ObjectId.isValid(slugOrId);
+      if (isObjectId) {
+        const _id = new Types.ObjectId(slugOrId);
+        filterQuery = {
+          $or: [{ slug: slugOrId }, { _id }],
+        };
+      }
+
+      const document = await this.categoryModel.findOneAndDelete(filterQuery);
+      const message = document
+        ? 'Категория была успешно удалена'
+        : `Категории по запросу ${slugOrId} не существует`;
+
+      const category = CategoryDto.fromDocument(document);
+
+      return { message, category };
+    } catch (error) {
+      this.logger.error(error);
+      // TODO review
+      return new InternalServerErrorException(error);
+    }
   }
   /**
    * @description Получить категорию по id или slug.

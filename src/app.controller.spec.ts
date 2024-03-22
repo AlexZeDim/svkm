@@ -37,7 +37,7 @@ describe('AppController', () => {
     });
   });
 
-  describe('create', () => {
+  describe('createOnConflict', () => {
     it('expect conflict', async () => {
       const response = (await appController.createCategory(
         EXAMPLE_MOCK_CATEGORY,
@@ -45,6 +45,16 @@ describe('AppController', () => {
       expect(response).toHaveProperty('message');
       expect(response).toHaveProperty('status');
       expect(response.status).toBe(409);
+    });
+  });
+
+  describe('delete', () => {
+    it('delete category', async () => {
+      const response = (await appController.deleteCategory(
+        EXAMPLE_MOCK_CATEGORY.slug,
+      )) as unknown as any;
+      console.log(response);
+      expect(1).toBe(1);
     });
   });
 

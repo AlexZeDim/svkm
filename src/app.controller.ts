@@ -33,12 +33,8 @@ export class AppController {
   }
 
   @Delete(':slugOrId')
-  async deleteCategory(
-    @Param('slugOrId') slugOrId: string,
-    @Res() res: Response,
-  ) {
-    const category = await this.appService.deleteCategory(slugOrId);
-    return res.status(HttpStatus.OK).json(category);
+  async deleteCategory(@Param('slugOrId') slugOrId: string) {
+    return await this.appService.deleteCategory(slugOrId);
   }
 
   @Get('/:query')
