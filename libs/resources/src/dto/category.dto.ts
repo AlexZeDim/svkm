@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { Category } from '@svkm/db-storage';
 import {
@@ -33,15 +33,23 @@ export class CategoryDto {
   @IsString()
   description: string;
 
-  // TODO add more
+  // TODO add more default?
   @ApiProperty(SWAGGER_CATEGORY_ACTIVE)
+  @IsBoolean()
   active: boolean;
 
   @ApiProperty(SWAGGER_CATEGORY_CREATED_AT)
   createdAt: Date;
 
-  fromDocument(document: Category): CategoryDto {
-    // TODO
-    return Object.assign(this, document);
+  public static fromDocument(document: Category): CategoryDto {
+    const id = document._id;
+    return Object.assign(this, {
+      id,
+      slug: document.slug,
+      name: document.name,
+      description: document.description,
+      active: document.active,
+      createdAt: document.createdAt,
+    });
   }
 }

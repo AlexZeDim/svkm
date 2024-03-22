@@ -10,7 +10,7 @@ export const SWAGGER_CATEGORY_ID: ApiPropertyOptions = {
 
 export const SWAGGER_CATEGORY_SLUG: ApiPropertyOptions = {
   name: 'slug',
-  description: 'Slug-name',
+  description: 'Уникальное имя категории unique slug-name',
   type: String,
   required: true,
   example: 'slug-name',
