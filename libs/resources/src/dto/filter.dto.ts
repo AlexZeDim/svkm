@@ -68,11 +68,11 @@ export class FilterDto {
     const filterOr = [];
     if (!isBySearch) {
       if (filterDto.name) {
-        filterOr.push({ name: { $search: filterDto.name } });
+        filterOr.push({ name: filterDto.name });
       }
 
       if (filterDto.description) {
-        filterOr.push({ description: { $search: filterDto.description } });
+        filterOr.push({ description: filterDto.description });
       }
 
       searchFilter = {
@@ -87,7 +87,7 @@ export class FilterDto {
       searchFilter = { active: filterDto.active };
     }
 
-    if (isBySearch && isByActive) {
+    if (!isByActiveOnly && isByActive) {
       searchFilter = {
         $and: [
           {
@@ -95,12 +95,6 @@ export class FilterDto {
           },
           { active: filterDto.active },
         ],
-      };
-    }
-
-    if (isBySearch) {
-      searchFilter = {
-        $or: filterOr,
       };
     }
 
