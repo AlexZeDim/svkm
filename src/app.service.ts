@@ -137,7 +137,6 @@ export class AppService implements OnApplicationBootstrap {
   async getByFilter(filter: Partial<FilterDto>) {
     try {
       const aggregationPipeline = FilterDto.fromDto(filter);
-
       const categories = await this.categoryModel.aggregate<Category>(
         aggregationPipeline,
       );

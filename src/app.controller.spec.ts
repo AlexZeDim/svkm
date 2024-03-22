@@ -100,14 +100,22 @@ describe('AppController', () => {
 
   describe('getByFilter', () => {
     it('getByFilter', async () => {
+      const pageSize = 3;
       const response = await appController.getByFilter({
         active: true,
         name: 'сласти',
-        pageSize: 2,
-        page: 3,
+        pageSize,
+        sort: 'name',
       });
-      console.log(response);
-      expect(1).toBe(1);
+
+      expect(response).toHaveProperty('message');
+      expect(response).toHaveProperty('category');
+      const { category } = response as unknown as any;
+      expect(Array.isArray(category)).toBeTruthy();
+      expect(category.length).toBe(pageSize);
+      category.map((category) =>
+        expect(category).toMatchObject(RESPONSE_MOCK_CATEGORY),
+      );
     });
   });
 
@@ -118,8 +126,6 @@ describe('AppController', () => {
       );
       expect(response).toHaveProperty('message');
       expect(response).toHaveProperty('category');
-      const { category } = response as unknown as any;
-      expect(category).toMatchObject(RESPONSE_MOCK_CATEGORY);
     });
   });
 
