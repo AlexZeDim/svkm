@@ -118,7 +118,7 @@ export class AppService implements OnApplicationBootstrap {
 
       const cacheCategory = getFromCache(slugOrId);
       if (cacheCategory) {
-        return { message: 'Категория найдена в кэше', cacheCategory };
+        return { message: 'Категория найдена в кэше', category: cacheCategory };
       }
 
       const categoryDocument = await this.categoryModel.findOne<Category>(

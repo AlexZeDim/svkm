@@ -90,6 +90,18 @@ describe('AppController', () => {
     });
   });
 
+  describe('getFromCache', () => {
+    it('fromCache', async () => {
+      const response = await appController.getByIdOrSlug(
+        EXAMPLE_MOCK_CATEGORY.slug,
+      );
+
+      const { category, message } = response as unknown as any;
+      expect(message).toBe('Категория найдена в кэше');
+      expect(category).toMatchObject(RESPONSE_MOCK_CATEGORY);
+    });
+  });
+
   describe('getBySlug', () => {
     it('byId', async () => {
       const response = await appController.getByIdOrSlug(id);
