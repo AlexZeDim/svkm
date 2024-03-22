@@ -78,6 +78,18 @@ export class FilterDto {
       pipeline.push(bySearchMatch);
     }
 
+    if (filterDto.sort) {
+      const isDesc = filterDto.sort.charAt(0) === '-';
+      const orderBy = isDesc ? -1 : 1;
+      const field = isDesc ? filterDto.sort.substring(1) : filterDto.sort;
+
+      const sort = {
+        $sort: { score: { $meta: 'textScore' }, [field]: orderBy },
+      };
+
+      pipeline.push(sort);
+    }
+
     const isByActive = 'active' in filterDto;
     if (isByActive) {
       const byActiveMatch = {
