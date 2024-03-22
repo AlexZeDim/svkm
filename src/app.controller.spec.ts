@@ -142,6 +142,6 @@ describe('AppController', () => {
   });
 
   afterAll(() => {
-    // return clearCityDatabase();
+    // return clearDatabase();
   });
 });

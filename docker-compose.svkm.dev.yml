@@ -13,18 +13,17 @@ services:
     ports:
       - "27017-27019:27017-27019"
 
-  redis-cache:
-    image: redis:7-alpine
+  svkm:
+    image: ghcr.io/alexzedim/svkm:latest
+    container_name: svkm
     restart: always
-    container_name: redis-cache
-    volumes:
-      - redis:/data:rw,z
-    expose:
-      - 6379
+    command: [ 'node', 'dist/main.js' ]
     ports:
-      - '6379:6379'
-    networks:
-      - svkm-network
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGO_CONNECTION=mongodb://svkm:svkm-mongo-node-1@mongo-db:27017/admin?authSource=admin&readPreference=primary
+
 
 # Docker Networks
 networks:
@@ -34,4 +33,3 @@ networks:
 
 volumes:
   mongo:
-  redis:
