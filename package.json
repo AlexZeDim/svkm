@@ -1,10 +1,10 @@
 {
   "name": "svkm",
   "version": "1.0.0",
-  "description": "",
-  "author": "",
+  "description": "SVKM",
+  "author": "alexzedim",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
