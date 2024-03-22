@@ -33,9 +33,7 @@ MONGO_CONNECTION=mongodb://svkm:svkm-mongo-node-1@127.0.0.1:27017/admin?authSour
 
 1. Речь шла о простом CRUD-api. Если хочется от-масштабировать решение, то:
 
-- добавить [нативной поддержки worker-ов](https://nodejs.org/api/cluster.html#cluster), через `node-cluster`
-- можно разделить API-layer и `serivce` layer, добавить очередь сообщений через rabbit-mq, bull-mq...
-- закрыть за внешним балансировщиком запросов, вроде nginx, и юзать [`robin-round`](https://en.wikipedia.org/wiki/Round-robin_scheduling) что-бы раскидывать `RPS` по N-контейнерам в инфре.
+- можно закрыть за внешним балансировщиком запросов, вроде nginx, раскатить его в `replaces: N` и юзать [`robin-round`](https://en.wikipedia.org/wiki/Round-robin_scheduling) что-бы раскидывать в зависимости от `RPS` запросы по N-контейнерам в инфре.
 
 2. Для логгирования используется стандартный `nest-logger`, можно добавить отдельный сервис, с коннектором и слать логи в ELK, Grafana...
 3. Можно добавить шифрование env-ов или управлять `env` через yml-манифест. Просто-потому-что ENV-не-резиновые.
