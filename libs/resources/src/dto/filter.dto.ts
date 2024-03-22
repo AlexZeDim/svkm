@@ -11,6 +11,8 @@ import {
 import { IsEnum, IsInt, IsString, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { SORING } from '@svkm/resources/const';
+import { FilterQuery } from 'mongoose';
+import { Category } from '@svkm/db-storage';
 
 export class FilterDto {
   @ApiProperty(SWAGGER_FILTER_NAME)
@@ -44,4 +46,55 @@ export class FilterDto {
   @ApiProperty(SWAGGER_FILTER_SORT)
   @IsEnum(SORING)
   sort: string;
+
+  public static fromDto(filterDto: FilterDto) {
+    const isBySearch = Boolean(filterDto.search);
+
+    const filterOr = isBySearch
+      ? [
+          { name: { $search: filterDto.search } },
+          { description: { $search: filterDto.search } },
+        ]
+      : [];
+
+    if (!isBySearch) {
+      if (filterDto.name) {
+        filterOr.push({ name: { $search: filterDto.name } });
+      }
+
+      if (filterDto.description) {
+        filterOr.push({ description: { $search: filterDto.description } });
+      }
+    }
+
+    let searchFilter: FilterQuery<Category> = {
+      $or: filterOr,
+    };
+
+    const isByActive = 'active' in filterDto;
+    const isByActiveOnly = filterOr.length === 0;
+
+    if (isByActiveOnly && isByActive) {
+      searchFilter = { active: filterDto.active };
+    }
+
+    if (isBySearch && isByActive) {
+      searchFilter = {
+        $and: [
+          {
+            $or: filterOr,
+          },
+          { active: filterDto.active },
+        ],
+      };
+    }
+
+    if (isBySearch) {
+      searchFilter = {
+        $or: filterOr,
+      };
+    }
+
+    return searchFilter;
+  }
 }

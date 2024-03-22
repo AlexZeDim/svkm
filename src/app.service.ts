@@ -1,10 +1,12 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
   OnApplicationBootstrap,
 } from '@nestjs/common';
+
 import { config } from '@svkm/config';
 import process from 'node:process';
 import { Model } from 'mongoose';
@@ -34,13 +36,13 @@ export class AppService implements OnApplicationBootstrap {
   /**
    * @description Создать категорию
    */
-  async createCategory(categoryDto: CategoryDto): Promise<CategoryDto> {
+  async createCategory(categoryDto: CategoryDto) {
     try {
       const isExists = await this.categoryModel.findOne({
         slug: categoryDto.slug,
       });
 
-      if (isExists) throw new ConflictException('Category already exist');
+      if (isExists) return new ConflictException('Category already exist');
 
       const category = new this.categoryModel(categoryDto);
 
@@ -48,6 +50,8 @@ export class AppService implements OnApplicationBootstrap {
       return CategoryDto.fromDocument(categoryDoc);
     } catch (error) {
       this.logger.error(error);
+      // TODO review
+      return new InternalServerErrorException(error);
     }
   }
   /**
@@ -55,20 +59,40 @@ export class AppService implements OnApplicationBootstrap {
    * модели. Например, возможность изменить только active без
    * необходимости передавать всю модель. И так для любого поля модели.
    */
-  async updateCategory(slug): string {
-    return 'updateCategory';
+  async updateCategory(slug: string, category: Partial<CategoryDto>) {
+    try {
+      return await this.categoryModel.findOneAndUpdate<Category>(
+        { slug: slug },
+        category,
+        {
+          upsert: false,
+          new: true,
+        },
+      );
+    } catch (error) {
+      this.logger.error(error);
+      // TODO review
+      return new InternalServerErrorException(error);
+    }
   }
   /**
    * @description Удалить категорию
    */
-  async deleteCategory(): string {
+  async deleteCategory(): Promise<string> {
     return 'deleteCategory!';
   }
   /**
    * @description Получить категорию по id или slug.
    */
-  getByIdOrSlug(query: string): string {
-    return 'getByIdOrSlug!';
+  async getByIdOrSlug(slug: string, id: string) {
+    // TODO from dto
+    const category = await this.categoryModel.findOne<Category>({
+      $or: [{ slug }, { _id: id }],
+    });
+
+    if (!category) return new NotFoundException('Category not found');
+
+    return CategoryDto.fromDocument(category);
   }
   /**
    * @description Получить массив категорий по фильтру. Без фильтров
@@ -79,48 +103,49 @@ export class AppService implements OnApplicationBootstrap {
     try {
       // TODO sort by
 
-      const categories = await this.categoryModel.find(filter);
-    } catch (e) {
-      this.logger.error(e);
-    }
+      const searchFilter = FilterDto.fromDto(filter);
+      const skip = filter.pageSize || 2;
+      const limit = 1;
 
-    return 'getByFilter!';
+      const categories = await this.categoryModel
+        .find(searchFilter)
+        .skip(skip)
+        .limit(limit);
+
+      return categories.map((category) => CategoryDto.fromDocument(category));
+    } catch (error) {
+      this.logger.error(error);
+      return new InternalServerErrorException(error);
+    }
   }
 
-  async generateMockData(length = 5000) {
+  async generateMockData() {
     try {
       const numOfDocuments = await this.categoryModel.countDocuments();
-      const isNumberOfDocuments = numOfDocuments >= length;
+      const [adjLength, categoryLength] = [adj.length, category.length];
+      const isNumberOfDocuments = numOfDocuments >= adjLength * categoryLength;
       this.logger.debug(
         `There are already ${isNumberOfDocuments} categories in the collection!`,
       );
       if (isNumberOfDocuments) return;
 
-      length = length - numOfDocuments;
+      this.logger.debug(`Adding mock categories in the collection...`);
 
-      this.logger.debug(`Adding ${length} categories in the collection...`);
+      const categories = category
+        .map((category, catItx) =>
+          adj.map(
+            (adj, adjItx) =>
+              new this.categoryModel({
+                name: capitalize(`${adj} ${category}`),
+                slug: toSlug(`${adj} ${category}`),
+                description: `${adj} ${category}`,
+                active: (catItx * adjItx) % 2 === 0,
+              }),
+          ),
+        )
+        .flat();
 
-      const documents = Array(length)
-        .fill(0)
-        .map((e, i) => {
-          const [adjLength, categoryLength] = [adj.length, category.length];
-
-          const adjItx = random(0, adjLength - 1);
-          const catItx = random(0, categoryLength - 1);
-
-          const [a, c] = [adj[adjItx], category[catItx]];
-
-          const name = capitalize(`${a} ${c}`);
-
-          return new this.categoryModel({
-            name,
-            slug: toSlug(name),
-            description: '',
-            active: i % 2 === 0,
-          });
-        });
-
-      await this.categoryModel.insertMany(documents);
+      await this.categoryModel.insertMany(categories);
     } catch (error) {
       this.logger.error(error);
     }
