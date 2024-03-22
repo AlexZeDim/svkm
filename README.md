@@ -26,10 +26,7 @@ MONGO_CONNECTION=mongodb://svkm:svkm-mongo-node-1@127.0.0.1:27017/admin?authSour
 
 `app.controller` - DTO, валидация через `@декораторы`
 `app.service` - основная логика приложения
-
-- libs
-
-Зависимые компоненты и ресурсы для приложения.
+`libs` - Зависимые компоненты и ресурсы для приложения, DAO, DTO, constants, utils...
 
 1. Речь шла о простом CRUD-api. Если хочется от-масштабировать решение, то:
 
