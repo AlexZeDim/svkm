@@ -42,7 +42,7 @@ jobs:
       - name: Build & Push (GHCR)
         uses: docker/build-push-action@v4.1.1
         with:
-          file: ./apps/Dockerfile
+          file: ./Dockerfile
           push: true
           tags: ghcr.io/alexzedim/svkm:latest
           labels: ${{ steps.meta.outputs.labels }}
