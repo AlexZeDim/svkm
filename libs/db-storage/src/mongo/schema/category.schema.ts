@@ -6,7 +6,7 @@ export class Category extends Document {
   @Prop({ type: String })
   _id: string;
 
-  @Prop({ type: String, required: true, index: true })
+  @Prop({ type: String, unique: true, required: true, index: true })
   slug: string;
 
   @Prop({ type: String, required: true })
