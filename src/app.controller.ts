@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
   Patch,
@@ -10,51 +11,42 @@ import {
   Res,
 } from '@nestjs/common';
 import { AppService } from './app.service';
-import {
-  CategoryBySlug,
-  CategoryDto,
-  CategoryResponse,
-  FilterDto,
-} from '@svkm/resources';
+import { Response } from 'express';
+import { CategoryBySlug, CategoryDto, FilterDto } from '@svkm/resources';
 
-@Controller()
+@Controller('category')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Post('/createCategory')
-  async createCategory(
-    @Res() res: any,
-    @Body() categoryDto: CategoryDto,
-  ): Promise<CategoryResponse> {
-    const category = await this.appService.createCategory(categoryDto);
-    return res.status(HttpStatus.OK).json({
-      message: 'Category has been created successfully',
-      category,
-    });
+  @Post('create')
+  @HttpCode(201)
+  async createCategory(@Body() categoryDto: CategoryDto) {
+    return await this.appService.createCategory(categoryDto);
   }
 
   @Patch('updateCategory/:slug')
   async updateCategory(
     @Param() param: CategoryBySlug,
-    @Res() res: any,
     @Body() body: Partial<CategoryDto>,
   ) {
-    const category = await this.appService.updateCategory(param.slug, body);
+    return await this.appService.updateCategory(param.slug, body);
+  }
+
+  @Delete(':slugOrId')
+  async deleteCategory(
+    @Param('slugOrId') slugOrId: string,
+    @Res() res: Response,
+  ) {
+    const category = await this.appService.deleteCategory(slugOrId);
     return res.status(HttpStatus.OK).json(category);
   }
 
-  @Delete('deleteCategory/:slug')
-  async deleteCategory() {
-    const category = await this.appService.deleteCategory();
-    // return res.status(HttpStatus.OK).json(category);
-  }
-
-  @Get('/getByIdOrSlug')
+  @Get('/:query')
   async getByIdOrSlug(query: string) {
     // await this.appService.getByIdOrSlug(query);
   }
 
-  @Get('/getByFilter')
+  @Get('getByFilter')
   async getByFilter(queryFilter: FilterDto) {
     return await this.appService.getByFilter(queryFilter);
   }

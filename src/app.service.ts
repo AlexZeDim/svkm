@@ -17,9 +17,9 @@ import {
   adj,
   capitalize,
   category,
+  CategoryByIdOrSlug,
   CategoryDto,
   FilterDto,
-  random,
   toSlug,
 } from '@svkm/resources';
 
@@ -44,13 +44,12 @@ export class AppService implements OnApplicationBootstrap {
 
       if (isExists) return new ConflictException('Category already exist');
 
-      const category = new this.categoryModel(categoryDto);
-
-      const categoryDoc = await this.categoryModel.create(category);
-      return CategoryDto.fromDocument(categoryDoc);
+      const document = new this.categoryModel(categoryDto);
+      const categoryDoc = await this.categoryModel.create(document);
+      const category = CategoryDto.fromDocument(categoryDoc);
+      return { message: 'Категория создана', category };
     } catch (error) {
       this.logger.error(error);
-      // TODO review
       return new InternalServerErrorException(error);
     }
   }
@@ -78,16 +77,18 @@ export class AppService implements OnApplicationBootstrap {
   /**
    * @description Удалить категорию
    */
-  async deleteCategory(): Promise<string> {
-    return 'deleteCategory!';
+  async deleteCategory(slugOrId: string) {
+    return this.categoryModel.findOneAndDelete({
+      $or: [{ slug: slugOrId }, { _id: slugOrId }],
+    });
   }
   /**
    * @description Получить категорию по id или slug.
    */
-  async getByIdOrSlug(slug: string, id: string) {
+  async getByIdOrSlug(args: CategoryByIdOrSlug) {
     // TODO from dto
     const category = await this.categoryModel.findOne<Category>({
-      $or: [{ slug }, { _id: id }],
+      $or: [{ slug: args.slug }, { _id: args.id }],
     });
 
     if (!category) return new NotFoundException('Category not found');

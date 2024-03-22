@@ -14,9 +14,7 @@ import {
 
 export class CategoryDto {
   @ApiProperty(SWAGGER_CATEGORY_ID)
-  @IsNotEmpty({ message: 'ID is required | ID обязательно!' })
-  @IsString()
-  id: string;
+  id?: string;
 
   @ApiProperty(SWAGGER_CATEGORY_SLUG)
   @IsNotEmpty({ message: 'Slug is required | Slug обязателен!' })
@@ -39,11 +37,11 @@ export class CategoryDto {
   active: boolean;
 
   @ApiProperty(SWAGGER_CATEGORY_CREATED_AT)
-  createdAt: Date;
+  createdAt?: Date;
 
   public static fromDocument(document: Category): CategoryDto {
-    const id = document._id;
-    return Object.assign(this, {
+    const id = document._id.toString();
+    return Object.assign(new CategoryDto(), {
       id,
       slug: document.slug,
       name: document.name,

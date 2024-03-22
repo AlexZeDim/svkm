@@ -3,9 +3,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ timestamps: true })
 export class Category extends Document {
-  @Prop({ type: String })
-  _id: string;
-
   @Prop({ type: String, unique: true, required: true, index: true })
   slug: string;
 
