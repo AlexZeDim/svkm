@@ -1,6 +1,6 @@
 import { CategoryDto } from '@svkm/resources';
 
-export const cacheMap = new Map<string | CategoryDto>([]);
+export const cacheMap = new Map<string, CategoryDto>([]);
 
 export const getFromCache = (slug: string) => {
   const isIn = cacheMap.has(slug);
@@ -18,6 +18,6 @@ export const getFromCache = (slug: string) => {
   return cacheCategory;
 };
 
-export const setToCache = (slug: string, category: Partial<CategoryDto>) => {
+export const setToCache = (slug: string, category: CategoryDto) => {
   cacheMap.set(slug, category);
 };
