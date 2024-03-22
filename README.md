@@ -3,8 +3,8 @@
 ## Варианты установки: 
 
 - собрать проект и запустить локально с помощью `$ npm install` и `$ npm start`
-- забрать `latest` [docker-образ с GHCR](https://github.com/AlexZeDim/svkm/pkgs/container/svkm) через команду `docker pull`
-- собрать в docker-образ самому через команду `npm docker:build`
+- забрать `latest` [docker-образ с GHCR](https://github.com/AlexZeDim/svkm/pkgs/container/svkm) через команду `docker pull ghcr.io/alexzedim/svkm:latest`
+- собрать в docker-образ самому через команду `npm build:docker`
 
 Манифест для `docker-compose` поможет запустить всё необходимое окружение `mongodb`.
 
