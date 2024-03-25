@@ -24,12 +24,10 @@ services:
       - NODE_ENV=production
       - MONGO_CONNECTION=mongodb://svkm:svkm-mongo-node-1@mongo-db:27017/admin?authSource=admin&readPreference=primary
 
-
-# Docker Networks
-networks:
-  # All container connect in a network
-  svkm-network:
-    driver: bridge
+# networks:
+  # Сеть нам не нужна, но можно, и указывать в config адреса контейнеров вместо localhost
+  # svkm-network:
+    # driver: bridge
 
 volumes:
   mongo:
